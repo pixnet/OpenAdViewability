@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Open Ad Viewability - Demo Page</title>
+	<style type="text/css">
+	.msg { font-size: 28px; text-align: center; }
+	#status { position: fixed; top:10px; right: 20px; background: #4E708A; color: white; border: #2D5476; padding: 20px; box-shadow: 1px 1px 2px rgba(0,0,0,0.4) }
+	#viewability_status.red { background-color: red; padding: 2px; }
+	#viewability_status.green { background-color: green; padding: 2px; }
+	#test-ad { margin: 1200px auto 300px auto; height: 300px; width: 640px; font-family: Helvetica, sans-serif; border: 1px solid #DDD; box-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
+	.ad-post { float: right; width: 50%; padding: 10px; }
+	.ad-thumbnail { float: left; width: 45%; margin-right: 0px; }
+	.ad-media { height: 300px; width: 100%;  }
+	.ad-sponsor { font-style: italic; }
+	.ad-reset { clear: both; }
+	</style>
+</head>
+<body>
+	<div class="msg">&darr; <i>Scroll Down</i> &darr;</div>
+	<div id="status">
+		<p id="viewability_status" class="red">Viewability Achieved: No</p>
+		<p id="viewability_percentage"></p>
+		<p id="duration"></p>
+	</div>
+	<div id="test-ad">
+	  	<div class="ad-post">
+			<h3 class="" style="">Lorem ipsum dolor sit amet, has at sonet putent dicunt</h3>
+	      	<div class="ad-sponsor">Promoted by Lorem ipsum</div>
+			<p class="" style="">Lorem ipsum dolor sit amet, has at sonet putent dicunt, ut mei numquam intellegam scripserit. At usu falli fuisset, graecis omnesque eu mei. Usu veri homero graeco cu, justo debitis indoctum ne qui. Has ne unum populo. Nam eu assum maiorum, mea te quis vituperatoribus.</p>
+		</div>
+		<div class="ad-thumbnail">
+			<div class="ad-media" style=";background-image:url('image.jpg');width:;height:;background-repeat: no-repeat;;background-position:center center;background-color:white;background-size: cover"></div>
+		</div>
+		<div class="ad-reset"></div>
+	</div>
+	<script type='text/javascript' src='../src/js/viewability.js'></script>
+	<script type='text/javascript'>
+		var ad_elem = document.getElementById('test-ad');
+		oav = new OpenAdViewability();
+		oav.DEBUG_MODE = true;
+		oav.checkViewability(ad_elem, function(check) {
+			if(check.viewabiltyStatus){
+				document.getElementById('viewability_status').innerHTML = 'Viewability Achieved: Yes';
+				document.getElementById('viewability_status').className = "green"
+			}
+			document.getElementById('viewability_percentage').innerHTML = 'Percentage Viewable: ' + (check.percentViewable >=0 ? check.percentViewable : 0);
+			document.getElementById('duration').innerHTML = 'Viewable Duraration: ' + (check.duration <=1000 ? check.duration : 1000) + 'ms';
+		});
+	</script>
+</body>
+</html>
