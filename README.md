@@ -15,7 +15,7 @@ Note: It does not track 'Viewable Video Impression'. It only tracks viewable imp
 
 ```javascript
 oav = new OpenAdViewability();
-oav.checkViewability(ad_elem, function(check){
+oav.checkViewability(ad_element, function(check){
   if(check.viewabilityStatus){
     // Your code here
   }
