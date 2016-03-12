@@ -1,7 +1,7 @@
 OpenAdViewability
 ======
 
-This JavaScript SDK is an open source version to track viewability metric for any ad element based on the MRC Viewability guidelines - http://mediaratingcouncil.org/081815%20Viewable%20Ad%20Impression%20Guideline_v2.0_Final.pdf. This implementation is extended from OpenVV - https://github.com/InteractiveAdvertisingBureau/openvv and developed by AdsNative.com
+This JavaScript SDK is an open source version to track viewability metric for any ad element based on the MRC Viewability guidelines - http://mediaratingcouncil.org/081815%20Viewable%20Ad%20Impression%20Guideline_v2.0_Final.pdf. This implementation is extended from OpenVV - https://github.com/InteractiveAdvertisingBureau/openvv and developed by AdsNative. The purpose of this SDK vs. OpenVV is to provide an ability to track viewability of an ad element as a whole instead for just video ads. 
 
 ## Features
 * According to MRC guidelines it tracks the viewability of an ad if the ad is at least 50% viewable for at least 1 second.
