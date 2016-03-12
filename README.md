@@ -12,3 +12,13 @@ This JavaScript SDK is an open source version to track viewability metric for an
 Note: It does not track 'Viewable Video Impression'. It only tracks viewable impressions for ad element as a whole.
 
 ## Usage
+
+```javascript
+oav = new OpenAdViewability();
+oav.DEBUG_MODE = true;
+oav.checkViewability(ad_elem, function(check){
+  if(check.viewabilityStatus){
+    // Your code here
+  }
+});
+```
