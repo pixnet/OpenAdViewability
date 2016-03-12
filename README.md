@@ -9,7 +9,7 @@ This JavaScript SDK is an open source version to track viewability metric for an
 * Unlike OpenVV it doesn't require Flash support from the browser. It tracks the viewability across all web browser platforms.
 * It tracks viewability even if the ad element is within the friendly-iframe. 
 
-Note: It does not track 'Viewable Video Impression'. It only tracks viewable impressions for ad element as a whole.
+Note: It does not track 'Viewable Video Impression'. It only tracks viewable impressions for the ad element as a whole.
 
 ## Usage
 
