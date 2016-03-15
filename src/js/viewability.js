@@ -109,7 +109,7 @@ function OpenAdViewability() {
      */
     var checkDomObscuring = function(ad){
         var adRect = ad.getBoundingClientRect(),
-            offset = 12,
+            offset = 0,
             xLeft = adRect.left+offset,
             xRight = adRect.right-offset,
             yTop = adRect.top+offset,
