@@ -68,7 +68,11 @@ function OpenAdViewability() {
             return false;
         }
 
-        checkGeometry(ad);
+        var viewabilityResult = checkGeometry(ad);
+
+        if (viewabilityResult.error) {
+            return false;
+        }
 
         if (check.percentViewable && check.percentViewable < check.acceptedViewablePercentage) {
             return false;
@@ -85,6 +89,8 @@ function OpenAdViewability() {
      * @param {Element} ad The HTML Element to measure
      */
     var checkGeometry = function (ad) {
+        var geometryViewabilityCalculator = new OAVGeometryViewabilityCalculator();
+
         check.percentObscured = check.percentObscured || 0;
         var viewabilityResult = geometryViewabilityCalculator.getViewabilityState(ad, window);
         if (!viewabilityResult.error) {
