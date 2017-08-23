@@ -1,7 +1,7 @@
 function OpenAdViewability() {
 
     /*
-        This implementation is according to MRC Viewability guidelines - 
+        This implementation is according to MRC Viewability guidelines -
         http://mediaratingcouncil.org/081815%20Viewable%20Ad%20Impression%20Guideline_v2.0_Final.pdf
     */
 
@@ -11,7 +11,7 @@ function OpenAdViewability() {
         percentObscured: 0,
         percentViewable: 0,
         acceptedViewablePercentage: 50,
-        viewabiltyStatus: false,
+        viewabilityStatus: false,
         duration: 0
     };
 
@@ -28,7 +28,7 @@ function OpenAdViewability() {
             }
             check.duration = count*100;
             if (count >= 9) {
-                check.viewabiltyStatus = true;
+                check.viewabilityStatus = true;
                 if(!that.DEBUG_MODE)
                     clearInterval(timer);
             }
@@ -71,7 +71,7 @@ function OpenAdViewability() {
     * @param {Element} ad The HTML Element to measure
     */
     var checkGeometry = function (ad) {
-        check.percentObscured = check.percentObscured || 0; 
+        check.percentObscured = check.percentObscured || 0;
         var viewabilityResult = geometryViewabilityCalculator.getViewabilityState(ad, window);
         if (!viewabilityResult.error) {
             check.percentViewable = viewabilityResult.percentViewable - check.percentObscured;
