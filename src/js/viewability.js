@@ -1,9 +1,9 @@
 function OpenAdViewability() {
 
     /*
-        This implementation is according to MRC Viewability guidelines -
-        http://mediaratingcouncil.org/081815%20Viewable%20Ad%20Impression%20Guideline_v2.0_Final.pdf
-    */
+     This implementation is according to MRC Viewability guidelines -
+     http://mediaratingcouncil.org/081815%20Viewable%20Ad%20Impression%20Guideline_v2.0_Final.pdf
+     */
 
     var geometryViewabilityCalculator = new OAVGeometryViewabilityCalculator();
 
@@ -17,16 +17,16 @@ function OpenAdViewability() {
 
     this.DEBUG_MODE = false;
 
-    this.checkViewability = function(ad, statusCallback){
+    this.checkViewability = function (ad, statusCallback) {
         var count = 0;
         var that = this;
-        var timer = setInterval(function() {
+        var timer = setInterval(function () {
             if (checkViewable(ad)) {
                 count++;
             } else {
                 count = 0;
             }
-            check.duration = count*100;
+            check.duration = count * 100;
             if (count >= 9) {
                 check.viewabilityStatus = true;
                 if(!that.DEBUG_MODE)
@@ -34,42 +34,44 @@ function OpenAdViewability() {
             }
             statusCallback(check);
         }, 100);
-    }
+    };
 
-    var checkViewable = function(ad) {
+    var checkViewable = function (ad) {
         var adRect = ad.getBoundingClientRect();
         var totalArea = adRect.width * adRect.height;
         // According to MRC standards, larget ad unit size have only 30% viewable requirements
-        if(totalArea >= 242500)
+        if (totalArea >= 242500) {
             check.acceptedViewablePercentage = 30;
+        }
 
-        if (checkCssInvisibility(ad) === true){
+        if (checkCssInvisibility(ad) === true) {
             return false;
         }
 
-        if (checkDomObscuring(ad) === true){
+        if (checkDomObscuring(ad) === true) {
             return false;
         }
 
         checkGeometry(ad);
 
-        if(check.percentViewable && check.percentViewable < check.acceptedViewablePercentage){
+        if (check.percentViewable && check.percentViewable < check.acceptedViewablePercentage) {
             return false;
         }
 
-        if(!check.percentViewable)
+        if (!check.percentViewable) {
             return false;
+        }
 
         return true;
     };
 
     /**
-    * Performs the geometry technique to determine viewability. First gathers
-    * information on the viewport and on the ad. Then compares the two to
-    * determine what percentage, if any, of the ad is within the bounds
-    * of the viewport.
-    * @param {Element} ad The HTML Element to measure
-    */
+     * Performs the geometry technique to determine viewability. First gathers
+     * information on the viewport and on the ad. Then compares the two to
+     * determine what percentage, if any, of the ad is within the bounds
+     * of the viewport.
+     * @param {Element} ad The HTML Element to measure
+     */
     var checkGeometry = function (ad) {
         check.percentObscured = check.percentObscured || 0;
         var viewabilityResult = geometryViewabilityCalculator.getViewabilityState(ad, window);
@@ -93,7 +95,7 @@ function OpenAdViewability() {
         var style = window.getComputedStyle(ad, null);
         var visibility = style.getPropertyValue('visibility');
         var display = style.getPropertyValue('display');
-        if ( visibility == 'hidden' || display == 'none' ){
+        if (visibility === 'hidden' || display === 'none') {
             return true;
         }
         return false;
@@ -107,32 +109,32 @@ function OpenAdViewability() {
      * the DOM of the iframe document
      * @param {Element} ad The HTML Element to measure
      */
-    var checkDomObscuring = function(ad){
+    var checkDomObscuring = function (ad) {
         var adRect = ad.getBoundingClientRect(),
             offset = 12,
-            xLeft = adRect.left+offset,
-            xRight = adRect.right-offset,
-            yTop = adRect.top+offset,
-            yBottom = adRect.bottom-offset,
-            xCenter = Math.floor(adRect.left+adRect.width/2),
-            yCenter = Math.floor(adRect.top+adRect.height/2),
+            xLeft = adRect.left + offset,
+            xRight = adRect.right - offset,
+            yTop = Math.max(0, adRect.top + offset),
+            yBottom = adRect.bottom - offset,
+            xCenter = Math.floor(adRect.left + adRect.width / 2),
+            yCenter = Math.floor(adRect.top + adRect.height / 2),
             testPoints = [
-                { x:xLeft,   y:yTop },
-                { x:xCenter, y:yTop },
-                { x:xRight,  y:yTop },
-                { x:xLeft,   y:yCenter },
-                { x:xCenter, y:yCenter },
-                { x:xRight,  y:yCenter },
-                { x:xLeft,   y:yBottom },
-                { x:xCenter, y:yBottom },
-                { x:xRight,  y:yBottom }
+                { x: xLeft, y: yTop },
+                { x: xCenter, y: yTop },
+                { x: xRight, y: yTop },
+                { x: xLeft, y: yCenter },
+                { x: xCenter, y: yCenter },
+                { x: xRight, y: yCenter },
+                { x: xLeft, y: yBottom },
+                { x: xCenter, y: yBottom },
+                { x: xRight, y: yBottom }
             ];
 
         for (var p in testPoints) {
             if (testPoints[p] && testPoints[p].x >= 0 && testPoints[p].y >= 0) {
                 elem = document.elementFromPoint(testPoints[p].x, testPoints[p].y);
 
-                if (elem != null && elem != ad && !ad.contains(elem)) {
+                if (elem !== null && elem !== ad && !ad.contains(elem)) {
                     overlappingArea = overlapping(adRect, elem.getBoundingClientRect());
                     if (overlappingArea > 0) {
                         check.percentObscured = 100 * overlapping(adRect, elem.getBoundingClientRect());
@@ -145,57 +147,55 @@ function OpenAdViewability() {
             }
         }
         return false;
-    }
+    };
 
     var overlapping = function(adRect, elem ){
         var adArea = adRect.width * adRect.height;
-        var  x_overlap = Math.max(0, Math.min(adRect.right, elem.right) - Math.max(adRect.left, elem.left));
-        var  y_overlap = Math.max(0, Math.min(adRect.bottom, elem.bottom) - Math.max(adRect.top, elem.top));
+        var x_overlap = Math.max(0, Math.min(adRect.right, elem.right) - Math.max(adRect.left, elem.left));
+        var y_overlap = Math.max(0, Math.min(adRect.bottom, elem.bottom) - Math.max(adRect.top, elem.top));
         return (x_overlap * y_overlap) / adArea;
     }
-
 }
-
 
 function OAVGeometryViewabilityCalculator() {
 
     this.getViewabilityState = function (element, contextWindow) {
         var minViewPortSize = getMinViewPortSize(),
             viewablePercentage;
-        if (minViewPortSize.area == Infinity) {
-            return { error: 'Failed to determine viewport'};
+        if (minViewPortSize.area === Infinity) {
+            return { error: 'Failed to determine viewport' };
         }
         var assetRect = element.getBoundingClientRect();
         var adArea = assetRect.width * assetRect.height;
         if ((minViewPortSize.area / adArea) < 0.5) {
             // no position testing required if viewport is less than half the area of the ad
             viewablePercentage = Math.floor(100 * minViewPortSize.area / adArea);
-        }else{
+        } else {
             var viewPortSize = getViewPortSize(window.top),
                 visibleAssetSize = getAssetVisibleDimension(element, contextWindow);
             //var viewablePercentage = getAssetViewablePercentage(assetSize, viewPortSize);
             //Height within viewport:
-            if ( visibleAssetSize.bottom > viewPortSize.height ) {
+            if (visibleAssetSize.bottom > viewPortSize.height) {
                 //Partially below the bottom
                 visibleAssetSize.height -= (visibleAssetSize.bottom - viewPortSize.height);
             }
-            if ( visibleAssetSize.top < 0 ) {
+            if (visibleAssetSize.top < 0) {
                 //Partially above the top
                 visibleAssetSize.height += visibleAssetSize.top;
             }
-            if ( visibleAssetSize.left < 0 ) {
+            if (visibleAssetSize.left < 0) {
                 visibleAssetSize.width += visibleAssetSize.left;
             }
-            if ( visibleAssetSize.right > viewPortSize.width ) {
-                visibleAssetSize.width -= ( visibleAssetSize.right - viewPortSize.width );
+            if (visibleAssetSize.right > viewPortSize.width) {
+                visibleAssetSize.width -= (visibleAssetSize.right - viewPortSize.width);
             }
             // Viewable percentage is the portion of the ad that's visible divided by the size of the ad
-            viewablePercentage = Math.floor( 100 * ( visibleAssetSize.width * visibleAssetSize.height ) / adArea );
+            viewablePercentage = Math.floor(100 * (visibleAssetSize.width * visibleAssetSize.height) / adArea);
         }
         /*
-        //Get ad dimensions:
-        var assetRect = element.getBoundingClientRect();
-        */
+         //Get ad dimensions:
+         var assetRect = element.getBoundingClientRect();
+         */
         return {
             clientWidth: viewPortSize.width,
             clientHeight: viewPortSize.height,
@@ -212,22 +212,21 @@ function OAVGeometryViewabilityCalculator() {
     ///////////////////////////////////////////////////////////////////////////
 
     // Check nested iframes
-    var getMinViewPortSize = function (){
+    var getMinViewPortSize = function () {
         var minViewPortSize = getViewPortSize(window),
             minViewPortArea = minViewPortSize.area,
             currentWindow = window;
 
-        while (currentWindow != window.top){
+        while (currentWindow !== window.top) {
             currentWindow = currentWindow.parent;
-            viewPortSize = getViewPortSize(currentWindow);
-            if (viewPortSize.area < minViewPortArea){
+            var viewPortSize = getViewPortSize(currentWindow);
+            if (viewPortSize.area < minViewPortArea) {
                 minViewPortArea = viewPortSize.area;
                 minViewPortSize = viewPortSize;
             }
         }
         return minViewPortSize;
-    }
-
+    };
 
     /**
      * Get the viewport size by taking the smallest dimensions
@@ -236,7 +235,7 @@ function OAVGeometryViewabilityCalculator() {
         var viewPortSize = {
             width: Infinity,
             height: Infinity,
-            area:Infinity
+            area: Infinity
         };
 
         //document.body  - Handling case where viewport is represented by documentBody
@@ -275,7 +274,6 @@ function OAVGeometryViewabilityCalculator() {
      * @param {element} The element to get his visible dimension
      * @param {contextWindow} The relative window
      */
-
     var getAssetVisibleDimension = function (element, contextWindow) {
         var currWindow = contextWindow;
         //Set parent window for recursive call
@@ -288,7 +286,7 @@ function OAVGeometryViewabilityCalculator() {
             elementRect.height = elementRect.bottom - elementRect.top;
             resultDimension = elementRect;
             //Calculate the relative element dimension if we clime to a parent window
-            if (currWindow != parentWindow) {
+            if (currWindow !== parentWindow) {
                 //Recursive call to get the relative element dimension from the parent window
                 var parentDimension = getAssetVisibleDimension(currWindow.frameElement, parentWindow);
                 //The asset is partially below the parent window (asset bottom is below the visible window)
@@ -324,18 +322,19 @@ function OAVGeometryViewabilityCalculator() {
 
         if (element) {
             var elementRect = element.getBoundingClientRect();
-            if (currWindow != parentWindow) {
+            if (currWindow !== parentWindow) {
                 resultPosition = getPositionRelativeToViewPort(currWindow.frameElement, parentWindow);
             }
-                resultPosition = {
-                    left: elementRect.left + resultPosition.left,
-                    right: elementRect.right + resultPosition.left,
-                    top: elementRect.top + resultPosition.top,
-                    bottom: elementRect.bottom + resultPosition.top
-                };
+            resultPosition = {
+                left: elementRect.left + resultPosition.left,
+                right: elementRect.right + resultPosition.left,
+                top: elementRect.top + resultPosition.top,
+                bottom: elementRect.bottom + resultPosition.top
+            };
         }
         return resultPosition;
     };
+
     /**
      * Calculate asset viewable percentage given the asset size and the viewport
      * @param {effectiveAssetRect} the asset viewable rect; effectiveAssetRect = {left :, top :,bottom:,right:,}
