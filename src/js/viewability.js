@@ -145,26 +145,83 @@ function OpenAdViewability() {
                 { x: xRight, y: yBottom }
             ];
 
-        for (var p in testPoints) {
-            if (testPoints[p] && testPoints[p].x >= 0 && testPoints[p].y >= 0) {
-                elem = document.elementFromPoint(testPoints[p].x, testPoints[p].y);
+        var overlappingList = [];
 
-                if (elem !== null && elem !== ad && !ad.contains(elem)) {
-                    overlappingArea = overlapping(adRect, elem.getBoundingClientRect());
+        for (var p in testPoints) {
+            if (!testPoints.hasOwnProperty(p)) {
+                continue;
+            }
+            if (testPoints[p] && testPoints[p].x >= 0 && testPoints[p].y >= 0) {
+                var elem = document.elementFromPoint(testPoints[p].x, testPoints[p].y);
+                if (mayDomOverlapping(ad, elem)) {
+                    var elemRect = elem.getBoundingClientRect();
+                    if (adRect.top > elemRect.bottom) {
+                        continue;
+                    }
+                    var overlappingArea = overlapping(adRect, elemRect);
                     if (overlappingArea > 0) {
-                        check.percentObscured = 100 * overlapping(adRect, elem.getBoundingClientRect());
-                        if (check.percentObscured > check.acceptedViewablePercentage) {
-                            check.percentViewable = 100 - check.percentObscured;
+                        if (!isRecorded(overlappingList, elem)) {
+                            overlappingList.push({ el: elem, area: overlappingArea });
+                        }
+                        if (check.percentObscured > (100 - check.acceptedViewablePercentage)) {
                             return true;
                         }
                     }
                 }
             }
         }
+
+        check.percentObscured = overlappingList.length > 0 ? 100 * overlappingList.map(item => item.area).reduce(function (a, b) {
+            return Math.max(a, b);
+        }) : 0;
+        check.percentViewable = 100 - check.percentObscured;
         return false;
     };
 
-    var overlapping = function(adRect, elem ){
+    var isRecorded = function (list, element) {
+        return list.length > 0 && list.map(item => item.el).some(el => el === element);
+    };
+
+    /**
+     * 判斷周圍元素是否可能與廣告重疊
+     * 周圍元素需存在、周圍元素非廣告本身、兩者非隸屬關係、周圍元素不是透明
+     * @param ad {Element} 廣告元素
+     * @param element {Element} 比對的周圍元素
+     */
+    var mayDomOverlapping = function (ad, element) {
+        return null !== element &&
+            ad !== element &&
+            !ad.contains(element) &&
+            !element.contains(ad) &&
+            !isOverlapTransparentElement(ad, element);
+    };
+
+    /**
+     * 判斷是否為覆蓋在廣告上方的透明元素
+     * 利用透明元素的要條來反推：沒有子元素、底圖、底色和邊框、大小與廣告相同
+     * @param ad {Element} 廣告元素
+     * @param element {Element} 比對的元素
+     */
+    var isOverlapTransparentElement = function (ad, element) {
+        var elemNodeName = element.nodeName,
+            style = window.getComputedStyle(element, null),
+            adRect = ad.getBoundingClientRect(),
+            elemRect = element.getBoundingClientRect(),
+            covered = adRect.top === elemRect.top &&
+                adRect.bottom === elemRect.bottom &&
+                adRect.left === elemRect.left &&
+                adRect.right === elemRect.right &&
+                adRect.height === elemRect.height &&
+                adRect.width === elemRect.width;
+        return 0 === element.childNodes.length &&
+            ('DIV' === elemNodeName || 'SPAN' === elemNodeName) &&
+            'none' === style.backgroundImage &&
+            'none' === style.borderStyle &&
+            'rgba(0, 0, 0, 0)' === style.backgroundColor &&
+            covered;
+    };
+
+    var overlapping = function (adRect, elem) {
         var adArea = adRect.width * adRect.height;
         var x_overlap = Math.max(0, Math.min(adRect.right, elem.right) - Math.max(adRect.left, elem.left));
         var y_overlap = Math.max(0, Math.min(adRect.bottom, elem.bottom) - Math.max(adRect.top, elem.top));
@@ -182,12 +239,14 @@ function OAVGeometryViewabilityCalculator() {
         }
         var assetRect = element.getBoundingClientRect();
         var adArea = assetRect.width * assetRect.height;
+
+        var viewPortSize = getViewPortSize(window.top),
+            visibleAssetSize = getAssetVisibleDimension(element, contextWindow);
+
         if ((minViewPortSize.area / adArea) < 0.5) {
             // no position testing required if viewport is less than half the area of the ad
             viewablePercentage = Math.floor(100 * minViewPortSize.area / adArea);
         } else {
-            var viewPortSize = getViewPortSize(window.top),
-                visibleAssetSize = getAssetVisibleDimension(element, contextWindow);
             //var viewablePercentage = getAssetViewablePercentage(assetSize, viewPortSize);
             //Height within viewport:
             if (visibleAssetSize.bottom > viewPortSize.height) {
