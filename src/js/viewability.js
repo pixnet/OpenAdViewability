@@ -18,22 +18,38 @@ function OpenAdViewability() {
     this.DEBUG_MODE = false;
 
     this.checkViewability = function (ad, statusCallback) {
-        var count = 0;
+        var startTime = getTime();
         var that = this;
-        var timer = setInterval(function () {
-            if (checkViewable(ad)) {
-                count++;
-            } else {
-                count = 0;
+        var timer = window.requestAnimFrame(countDownStart);
+
+        function countDownStart() {
+            if (!checkViewable(ad)) {
+                startTime = getTime();
+                resetCheck();
             }
-            check.duration = count * 100;
-            if (count >= 9) {
+            var offset = getTime() - startTime;
+            var timeUp = offset >= 1000;
+            check.duration = offset;
+            if (timeUp) {
                 check.viewabilityStatus = true;
-                if(!that.DEBUG_MODE)
-                    clearInterval(timer);
+                if (!that.DEBUG_MODE) {
+                    window.cancelAFrame(timer);
+                }
+            } else {
+                timer = window.requestAnimFrame(countDownStart);
             }
             statusCallback(check);
-        }, 100);
+        }
+
+        function getTime() {
+            return 'object' === typeof window.performance ? window.performance.now() : new Date().getTime();
+        }
+    };
+
+    var resetCheck = function () {
+        check.percentObscured = 0;
+        check.duration = 0;
+        check.viewabilityStatus = false;
     };
 
     var checkViewable = function (ad) {
