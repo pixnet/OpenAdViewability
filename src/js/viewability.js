@@ -44,11 +44,11 @@ function OpenAdViewability() {
             check.acceptedViewablePercentage = 30;
         }
 
-        if (checkCssInvisibility(ad) === true) {
+        if (checkCssInvisibility(ad)) {
             return false;
         }
 
-        if (checkDomObscuring(ad) === true) {
+        if (checkDomObscuring(ad)) {
             return false;
         }
 
@@ -58,11 +58,7 @@ function OpenAdViewability() {
             return false;
         }
 
-        if (!check.percentViewable) {
-            return false;
-        }
-
-        return true;
+        return check.percentViewable;
     };
 
     /**
@@ -95,10 +91,7 @@ function OpenAdViewability() {
         var style = window.getComputedStyle(ad, null);
         var visibility = style.getPropertyValue('visibility');
         var display = style.getPropertyValue('display');
-        if (visibility === 'hidden' || display === 'none') {
-            return true;
-        }
-        return false;
+        return 'hidden' === visibility || 'none' === display;
     };
 
     /**
